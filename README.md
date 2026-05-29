@@ -5,11 +5,13 @@
 * **🔗 Centralización:** Actuar como el núcleo maestro encargado de enlazar y coordinar el ciclo de vida de plataformas multi-módulo.
 * **📐 Gobernanza Global:** Abstraer las variables críticas del sistema (región, nombres, tipos de hardware) para aprovisionar entornos replicables desde un único punto de control.
 * **🧩 Inyección de Dependencias:** Conectar dinámicamente las salidas del ecosistema de redes con las entradas de cómputo, eliminando el acoplamiento duro.
+* **🛡️ Gobernanza Multi-Capa Activa:** Consolidar e interceptar las políticas de seguridad perimetral y costos corporativos en un solo motor de evaluación centralizado antes del despliegue.
 
 ### 2. 🔌 Propósito General del Código
 Este repositorio es el "cerebro" o código principal de la arquitectura. Su diseño está orientado a consumir e interconectar bloques constructores remotos mediante las siguientes acciones:
-* **📡 Consumo Remoto de Módulos:** Descarga e instala los componentes de **Redes** y **Cómputo** directamente desde sus repositorios en GitHub utilizando versionamiento semántico formal (`?ref=v0.1.0`).
+* **📡 Consumo Remoto de Módulos:** Descarga e instala los componentes de **Redes** y **Cómputo** directamente desde sus repositorios en GitHub utilizando versionamiento semántico formal e inquebrantable (`?ref=v0.2.0`).
 * **🔄 Resolución Dinámica de Red:** Extrae el ID de subred pública directamente de la lista generada por el módulo base (`module.redes.subnet_ids[0]`) y lo inyecta en el servidor para garantizar el direccionamiento perimetral correcto.
+* **🤖 Pipeline de Integración Continua (CI Global):** Automatización en GitHub Actions que ejecuta `terraform init -upgrade` para forzar la descarga de los módulos remotos, evalúa la sintaxis general y corre **Open Policy Agent (OPA)** de forma integral para validar que se cumplan las políticas de costo (EC2 `t2.micro`) y seguridad (Bloqueo de SSH universal `0.0.0.0/0`).
 
 ---
 

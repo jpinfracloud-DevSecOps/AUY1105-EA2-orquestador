@@ -1,0 +1,90 @@
+name: CI - Orquestador (solucion completa)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validacion:
+    name: Calidad y seguridad
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN:     ${{ secrets.AWS_SESSION_TOKEN }}
+      AWS_DEFAULT_REGION:    ${{ secrets.AWS_REGION }}
+
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configurar Open Policy Agent (OPA)
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: latest
+
+      - name: Configurar TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: Formato del codigo (terraform fmt)
+        run: terraform fmt -check -recursive
+
+      - name: Inicializar Terraform (Descarga de Modulos v0.2.0)
+        run: terraform init -input=false -upgrade
+
+      - name: Validar configuracion (terraform validate)
+        run: terraform validate
+
+      - name: Analisis estatico (TFLint)
+        run: tflint -f compact
+
+      - name: Analisis de seguridad (Checkov)
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          framework: terraform
+          quiet: true
+          soft_fail: true
+
+      - name: Validacion de politicas OPA (SSH + EC2)
+        run: |
+          terraform plan -out=tfplan -input=false
+          terraform show -json tfplan > plan.json
+
+          FAIL=0
+
+          echo "=== 🌐 Evaluando Politica de Redes: SSH Perimetral ==="
+          SSH_V=$(opa eval -f raw -d policies/terraform_ssh_check.rego -i plan.json "count(data.terraform.ssh.violation)")
+          if [ "$SSH_V" != "0" ] && [ "$SSH_V" != "" ]; then
+            echo "❌ POLITICA SSH - VIOLACIONES ENCONTRADAS:"
+            opa eval -f pretty -d policies/terraform_ssh_check.rego -i plan.json "data.terraform.ssh.violation"
+            FAIL=1
+          else
+            echo "✅ POLITICA SSH OK - Perímetro seguro."
+          fi
+
+          echo "=== 🖥️ Evaluando Politica de Costos: Hardware EC2 ==="
+          EC2_V=$(opa eval -f raw -d policies/terraform_ec2_check.rego -i plan.json "count(data.terraform.ec2.violation)")
+          if [ "$EC2_V" != "0" ] && [ "$EC2_V" != "" ]; then
+            echo "❌ POLITICA EC2 - VIOLACIONES ENCONTRADAS:"
+            opa eval -f pretty -d policies/terraform_ec2_check.rego -i plan.json "data.terraform.ec2.violation"
+            FAIL=1
+          else
+            echo "✅ POLITICA EC2 OK - Tamaño t2.micro respetado."
+          fi
+
+          if [ "$FAIL" -eq 1 ]; then
+            echo "🚨 Error: Se encontraron violaciones críticas en las políticas de gobernanza de la EVA2."
+            exit 1
+          fi
+          
+          echo "🚀 Todas las politicas OPA validadas y aprobadas con éxito para el despliegue."
