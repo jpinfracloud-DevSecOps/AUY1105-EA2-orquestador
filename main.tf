@@ -13,7 +13,7 @@ module "computo" {
   project_name  = var.project_name
   instance_type = var.instance_type
   ami_id        = var.ami_id
-  
+
   # Corrección técnica: Extraemos el primer elemento [0] de la lista 'subnet_ids'
-  subnet_id     = module.redes.subnet_ids[0]
+  subnet_id = module.redes.subnet_ids[0]
 }
