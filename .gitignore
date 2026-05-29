@@ -1,0 +1,16 @@
+# Archivos de configuración local de Terraform
+.terraform/
+.terraform.lock.hcl
+
+# Estados de Terraform (Contienen IPs, contraseñas y datos en texto plano)
+*.tfstate
+*.tfstate.backup
+
+# Variables de entorno y secretos locales
+*.tfvars
+*.tfvars.json
+.env
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
