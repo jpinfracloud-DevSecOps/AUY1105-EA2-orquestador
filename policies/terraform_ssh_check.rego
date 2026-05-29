@@ -2,8 +2,6 @@ package terraform.ssh
 
 import future.keywords.in
 
-default violation = set()
-
 violation contains msg if {
     some change in input.resource_changes
     change.type == "aws_security_group"
