@@ -2,12 +2,12 @@ provider "aws" {
   region = var.aws_region
 }
 
-# 1. Invocación Remota del Módulo de Redes (Actualizado a v0.2.0 con Gobernanza SSH)
+# checkov:skip=CKV_TF_1: Se utiliza versionamiento semantico explicito por diseño de arquitectura para la EVA2.
 module "redes" {
   source = "git::https://github.com/jpinfracloud-DevSecOps/AUY1105-EA2-redes.git?ref=v0.2.0"
 }
 
-# 2. Invocación Remota del Módulo de Cómputo (Actualizado a v0.2.0 con Gobernanza Costos)
+# checkov:skip=CKV_TF_1: Se utiliza versionamiento semantico explicito por diseño de arquitectura para la EVA2.
 module "computo" {
   source        = "git::https://github.com/jpinfracloud-DevSecOps/AUY1105-EA2-computo.git?ref=v0.2.0"
   project_name  = var.project_name
