@@ -2,9 +2,6 @@
 
 Todos los cambios notables en este proyecto serán documentados en este archivo de acuerdo con los estándares de la evaluación y buenas prácticas de desarrollo.
 
-### Cambiado
-- 🔗 **Acoplamiento de Módulos Seguros:** Actualización de las fuentes en `main.tf` para apuntar explícitamente a los tags remotos estables de producción `?ref=v0.2.0` de los módulos de Redes y Cómputo.
-
 ## [0.1.0] - 2026-05-28
 
 ### Añadido
@@ -16,12 +13,12 @@ Todos los cambios notables en este proyecto serán documentados en este archivo 
 ## [0.2.0] - 2026-05-28
 
 ### Añadido
-- 🛡️ **Orquestación de Gobernanza (OPA Global):** Integración de las reglas `policies/terraform_ssh_check.rego` y `policies/terraform_ec2_check.rego` para auditar de manera unificada el plan JSON consolidation de la infraestructura.
+- 🛡️ **Orquestación de Gobernanza (OPA Global):** Integración de las reglas `policies/terraform_ssh_check.rego` y `policies/terraform_ec2_check.rego` para auditar de manera unificada el plan JSON consolidado de la infraestructura.
 - 🚀 **Pipeline Multi-Capa (CI):** Automatización en `.github/workflows/ci.yml` que valida el formateo, consistencia estática y el cumplimiento estricto de las dos políticas de la EVA2 en un solo flujo de control.
-- 
+
 ### Cambiado
-- 🔗 **Acoplamiento de Módulos Seguros:** Actualización de las fuentes en `main.tf` para apuntar explícitamente a los tags remotos estables de producción `?ref=v0.2.0` de los módulos de Redes y Cómputo.
+- 🔒 **Inmutabilidad Criptográfica (DevSecOps Estricto):** Migración de las fuentes en `main.tf` desde tags semánticos hacia hashes SHA largos (`66612180...` y `987fde86...`), garantizando la protección total de la cadena de suministro y cumpliendo nativamente con la política `CKV_TF_1` de Checkov.
 - ⚙️ **Optimización de Inicialización:** Ajuste en el comando del pipeline a `terraform init -upgrade` para forzar la sincronización limpia de submódulos remotos sin conflictos de caché.
-- ### Solucionado
+
+### Solucionado
 - 🛠️ **Homologación Sintáctica OPA v1.0:** Corrección de las políticas Rego adoptando los tokens explícitos `contains` e `if`, eliminando los conflictos de tipos de datos (`default violation`) provocados por la actualización del binario en GitHub Actions.
-- 🔒 **Excepciones de Seguridad Auditadas (#8):** Implementación de comentarios de supresión quirúrgica (`# checkov:skip=CKV_TF_1`) en el `main.tf`. Esto permitió mitigar las alertas de hashes inmutables de Checkov, justificando técnicamente el uso de versionamiento semántico exigido por la rúbrica y logrando el aprobado ("Passed") real del pipeline.
